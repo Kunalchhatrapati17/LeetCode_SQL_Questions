@@ -1,0 +1,26 @@
+# Write your MySQL query statement below
+# Visited On Column is important to find the minimum Visited date
+SELECT visited_on,
+(
+    SELECT SUM(amount)
+    FROM Customer
+    WHERE visited_on BETWEEN DATE_SUB(c.visited_on, Interval 6 day)
+    AND c.visited_on
+)AS amount,
+ROUND((
+    SELECT SUM(amount)/7
+    FROM Customer
+    WHERE visited_on Between DATE_SUB(c.visited_on, Interval 6 Day)
+    AND c.visited_on
+), 2) AS Average_amount
+
+# These approach is required because of the sliding window concept
+# As the range of the days is not set
+
+From Customer c
+where visited_on>=(
+    SELECT DATE_ADD(MIN(visited_on), Interval 6 day)
+    from Customer
+)
+group by visited_on
+order by visited_on
